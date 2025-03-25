@@ -407,3 +407,47 @@ void dll::LASERS::Release()
 }
 
 /////////////////////////////////
+
+// FACTORY *********************
+
+GAME_API dll::Object dll::Factory(uint8_t what, float on_x, float on_y, float to_x, float to_y)
+{
+	Object ret{ nullptr };
+
+	switch (what)
+	{
+	case type_small_star:
+		ret = new STARS(type_small_star, on_x, on_y);
+		break;
+
+	case type_mid_star:
+		ret = new STARS(type_mid_star, on_x, on_y);
+		break;
+
+	case type_big_star:
+		ret = new STARS(type_big_star, on_x, on_y);
+		break;
+
+	case type_meteor1:
+		ret = new METEORS(type_meteor1, on_x, on_y);
+		break;
+
+	case type_meteor2:
+		ret = new METEORS(type_meteor2, on_x, on_y);
+		break;
+
+	case type_meteor3:
+		ret = new METEORS(type_meteor3, on_x, on_y);
+		break;
+
+	case type_left_laser:
+		ret = new LASERS(type_left_laser, on_x, on_y, to_x, to_y);
+		break;
+
+	case type_right_laser:
+		ret = new LASERS(type_right_laser, on_x, on_y, to_x, to_y);
+		break;
+	}
+
+	return ret;
+}
