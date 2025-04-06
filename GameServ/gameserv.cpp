@@ -110,17 +110,17 @@ dll::BASE::BASE(uint8_t _what, float __x, float __y, float __to_x, float __to_y)
 	{
 	case type_small_star:
 		speed = 1.0f;
-		NewDims(8.0f, 10.0f);
+		NewDims(3.0f, 4.0f);
 		break;
 
 	case type_mid_star:
 		speed = 1.0f;
-		NewDims(9.5f, 11.0f);
+		NewDims(4.2f, 5.5f);
 		break;
 
 	case type_big_star:
 		speed = 1.0f;
-		NewDims(12.0f, 15.0f);
+		NewDims(5.8f, 6.5f);
 		break;
 
 	case type_meteor1:
@@ -221,6 +221,7 @@ dll::STARS::STARS(uint8_t which, float _where_x, float _where_y) :BASE(which, _w
 bool dll::STARS::Move(float gear, bool canvas_move, dirs to_where)
 {
 	float now_speed = speed + gear / 10.0f;
+	dir = to_where;
 
 	switch (dir)
 	{
@@ -295,8 +296,11 @@ bool dll::METEORS::Move(float gear, bool canvas_move, dirs to_where)
 
 	start.x -= gear / 5;
 	end.x += gear / 5;
-	start.y -= gear / 5;
-	end.y += gear / 5;
+	start.y += gear / 5;
+	end.y += gear * 2 / 5;
+
+	width = end.x - start.x;
+	height = end.y - start.y;
 
 	center.x = start.x + width / 2;
 	center.y = start.y + height / 2;
@@ -318,6 +322,18 @@ bool dll::METEORS::Move(float gear, bool canvas_move, dirs to_where)
 		{
 		case dirs::left:
 			SetPath(0, start.y);
+			if (vert_line)
+			{
+				start.y += now_speed;
+				SetEdges();
+				break;
+			}
+			else if (hor_line)
+			{
+				start.x -= now_speed;
+				SetEdges();
+				break;
+			}
 			start.x -= now_speed;
 			start.y = start.x * slope + intercept;
 			SetEdges();
@@ -325,6 +341,18 @@ bool dll::METEORS::Move(float gear, bool canvas_move, dirs to_where)
 
 		case dirs::right:
 			SetPath(scr_width, start.y);
+			if (vert_line)
+			{
+				start.y += now_speed;
+				SetEdges();
+				break;
+			}
+			else if (hor_line)
+			{
+				start.x += now_speed;
+				SetEdges();
+				break;
+			}
 			start.x += now_speed;
 			start.y = start.x * slope + intercept;
 			SetEdges();
@@ -332,6 +360,19 @@ bool dll::METEORS::Move(float gear, bool canvas_move, dirs to_where)
 
 		case dirs::up:
 			SetPath(start.x, sky);
+			if (vert_line)
+			{
+				start.y -= now_speed;
+				SetEdges();
+				break;
+			}
+			else if (hor_line)
+			{
+				if (start.x <= scr_width / 2)start.x += now_speed;
+				else start.x -= now_speed;
+				SetEdges();
+				break;
+			}
 			if (start.x <= scr_width / 2)start.x += now_speed;
 			else start.x -= now_speed;
 			start.y = start.x * slope + intercept;
@@ -340,6 +381,19 @@ bool dll::METEORS::Move(float gear, bool canvas_move, dirs to_where)
 
 		case dirs::down:
 			SetPath(start.x, ground);
+			if (vert_line)
+			{
+				start.y += now_speed;
+				SetEdges();
+				break;
+			}
+			else if (hor_line)
+			{
+				if (start.x <= scr_width / 2)start.x += now_speed;
+				else start.x -= now_speed;
+				SetEdges();
+				break;
+			}
 			if (start.x <= scr_width / 2)start.x += now_speed;
 			else start.x -= now_speed;
 			start.y = start.x * slope + intercept;
@@ -348,6 +402,19 @@ bool dll::METEORS::Move(float gear, bool canvas_move, dirs to_where)
 
 		case dirs::up_left:
 			SetPath(0, sky);
+			if (vert_line)
+			{
+				start.y -= now_speed;
+				start.x -= now_speed;
+				SetEdges();
+				break;
+			}
+			else if (hor_line)
+			{
+				start.x -= now_speed;
+				SetEdges();
+				break;
+			}
 			start.x -= now_speed;
 			start.y = start.x * slope + intercept;
 			SetEdges();
@@ -355,6 +422,19 @@ bool dll::METEORS::Move(float gear, bool canvas_move, dirs to_where)
 
 		case dirs::up_right:
 			SetPath(scr_width, sky);
+			if (vert_line)
+			{
+				start.y -= now_speed;
+				start.x += now_speed;
+				SetEdges();
+				break;
+			}
+			else if (hor_line)
+			{
+				start.x += now_speed;
+				SetEdges();
+				break;
+			}
 			start.x += now_speed;
 			start.y = start.x * slope + intercept;
 			SetEdges();
@@ -362,6 +442,19 @@ bool dll::METEORS::Move(float gear, bool canvas_move, dirs to_where)
 
 		case dirs::down_left:
 			SetPath(0, ground);
+			if (vert_line)
+			{
+				start.y += now_speed;
+				start.x -= now_speed;
+				SetEdges();
+				break;
+			}
+			else if (hor_line)
+			{
+				start.x -= now_speed;
+				SetEdges();
+				break;
+			}
 			start.x -= now_speed;
 			start.y = start.x * slope + intercept;
 			SetEdges();
@@ -369,12 +462,27 @@ bool dll::METEORS::Move(float gear, bool canvas_move, dirs to_where)
 
 		case dirs::down_right:
 			SetPath(scr_width, ground);
+			if (vert_line)
+			{
+				start.y += now_speed;
+				start.x += now_speed;
+				SetEdges();
+				break;
+			}
+			else if (hor_line)
+			{
+				start.x += now_speed;
+				SetEdges();
+				break;
+			}
 			start.x += now_speed;
 			start.y = start.x * slope + intercept;
 			SetEdges();
 			break;
 		}
 	}
+	if (start.x <= -scr_width / 3 || end.x >= scr_width + scr_width / 3
+		|| start.y <= -scr_height / 3 || end.y >= scr_height + scr_height / 3)return false;
 
 	return true;
 }
@@ -393,11 +501,56 @@ bool dll::LASERS::Move(float gear, bool canvas_move, dirs to_where)
 {
 	float now_speed = speed + gear / 10.0f;
 
-	if (type == type_left_laser)start.x += now_speed;
-	else start.x -= now_speed;
-	start.y = start.x * slope + intercept;
-	SetEdges();
-	if (end.x <= sky || start.y >= ground || end.x <= 0 || start.x >= scr_width)return false;
+	if (type == type_left_laser)
+	{
+		if (vert_line)
+		{
+			start.y -= now_speed;
+			SetEdges();
+			if (end.y <= sky || start.y >= ground || end.x <= 0 || start.x >= scr_width)return false;
+			else return true;
+		}
+		else if (hor_line)
+		{
+			start.x += now_speed;
+			SetEdges();
+			if (end.y <= sky || start.y >= ground || end.x <= 0 || start.x >= scr_width)return false;
+			else return true;
+		}
+		else
+		{
+			if (move_sx < move_ex)start.x += now_speed;
+			else start.x -= now_speed;
+			start.y = start.x * slope + intercept;
+			SetEdges();
+			if (end.y <= sky || start.y >= ground || end.x <= 0 || start.x >= scr_width)return false;
+		}
+	}
+	else
+	{
+		if (vert_line)
+		{
+			start.y -= now_speed;
+			SetEdges();
+			if (end.y <= sky || start.y >= ground || end.x <= 0 || start.x >= scr_width)return false;
+			else return true;
+		}
+		else if (hor_line)
+		{
+			start.x -= now_speed;
+			SetEdges();
+			if (end.y <= sky || start.y >= ground || end.x <= 0 || start.x >= scr_width)return false;
+			else return true;
+		}
+		else
+		{
+			if (move_sx < move_ex)start.x += now_speed;
+			else start.x -= now_speed;
+			start.y = start.x * slope + intercept;
+			SetEdges();
+			if (end.y <= sky || start.y >= ground || end.x <= 0 || start.x >= scr_width)return false;
+		}
+	}
 
 	return true;
 }
